@@ -1,4 +1,4 @@
 run: 
-    ./compile.sh ; ./out/editor testfile.txt
+    ./compile.sh ; ./out/editor testfile.txt  log.txt
   
 

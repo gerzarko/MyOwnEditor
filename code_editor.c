@@ -7,9 +7,9 @@
 
 int main(int argc, char **argv) {
 
-  if (argc != 2) {
-    return 1;
-  }
+  // if (argc != 2) {
+  //   return 1;
+  // }
 
   // struct que tiene el tamano de la pantalla en pixeles
   struct winsize windowSize;
@@ -29,6 +29,10 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  FILE *log = fopen(argv[2], "w");
+  if (log == NULL) {
+    return 1;
+  }
   // fd es el puntero al inicio del archivo, bytebuffer es la canatidad de bytes
   // que vamos leyendo de ese archivo
   uint32_t itemsRead = fread(byteBuffer, 1, sizeOfbuffer, fd);
@@ -36,11 +40,22 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  uint32_t i = 0;
   for (uint32_t y = 0; y < windowSize.ws_row; y++) {
     for (uint32_t x = 0; x < windowSize.ws_col; x++) {
+      if (byteBuffer[i] == '\n') {
+        y++;
+        x = 0;
+        i++;
+      }
       printf("\033[%d;%df", y, x);
       fflush(stdout);
       printf("%c", byteBuffer[x + (y * windowSize.ws_col)]);
+
+      char logline[4096];
+      uint32_t written =
+          sprintf(logline, "%d %d", windowSize.ws_row, windowSize.ws_col);
+      fwrite(logline, 1, written, log);
     }
   }
 
