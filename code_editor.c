@@ -17,16 +17,15 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  printf("\033[?47h");
+  printf("\033[?1049h");
   printf("\033[0;0f");
   fflush(stdout);
 
-  uint32_t sizeOfbuffer = sizeof(windowSize.ws_row * windowSize.ws_col);
+  uint32_t sizeOfbuffer = windowSize.ws_row * windowSize.ws_col;
   char *byteBuffer = malloc(sizeOfbuffer);
 
   FILE *fd = fopen(argv[1], "r");
   if (fd == NULL) {
-    printf("error aca");
     return 1;
   }
 
@@ -44,8 +43,6 @@ int main(int argc, char **argv) {
       printf("%c", byteBuffer[x + (y * windowSize.ws_col)]);
     }
   }
-
-  printf("%s", byteBuffer);
 
   fclose(fd);
   // sleep(5);
