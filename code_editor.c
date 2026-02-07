@@ -54,8 +54,8 @@ int main(int argc, char **argv) {
 
       char logline[4096];
       uint32_t written =
-          sprintf(logline, "%d %d", windowSize.ws_row, windowSize.ws_col);
-      fwrite(logline, 1, written, log);
+          sprintf(logline, "%d %d \n", windowSize.ws_row, windowSize.ws_col);
+      fwrite(logline, written, 1, log);
     }
   }
 
