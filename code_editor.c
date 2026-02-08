@@ -5,6 +5,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+typedef struct State {
+
+  FILE *fd;
+  char *byteBuffer;
+  uint32_t bufferSize;
+  uint32_t colAmount;
+  uint32_t rowAmount;
+
+} State;
+
 int main(int argc, char **argv) {
 
   // if (argc != 2) {
@@ -66,3 +76,5 @@ int main(int argc, char **argv) {
   printf("\033[?1049l");
   fflush(stdout);
 }
+
+void PrintToScreen(State state, uint32_t col, uint32_t row, char *Buffer) {}
