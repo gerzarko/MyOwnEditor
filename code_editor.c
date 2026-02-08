@@ -59,7 +59,6 @@ int main(int argc, char **argv) {
 }
 
 void PrintToScreen(State state, FILE *log) {
-
   uint32_t i = 0;
   for (uint32_t y = 1; y < state.rowAmount; y++) {
     for (uint32_t x = 1; x < state.colAmount; x++) {
@@ -70,10 +69,6 @@ void PrintToScreen(State state, FILE *log) {
       printf("\033[%d;%df", y, x);
       fflush(stdout);
       printf("%c", state.byteBuffer[i]);
-
-      char logline[4096];
-      uint32_t written = sprintf(logline, "%c", state.byteBuffer[i]);
-      fwrite(logline, written, 1, log);
       i++;
     }
   }
