@@ -51,25 +51,6 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  uint32_t i = 0;
-  for (uint32_t y = 1; y < windowSize.ws_row; y++) {
-    for (uint32_t x = 1; x < windowSize.ws_col; x++) {
-      if (byteBuffer[i] == '\n') {
-        i++;
-        break;
-      }
-      printf("\033[%d;%df", y, x);
-      fflush(stdout);
-      printf("%c", byteBuffer[i]);
-
-      char logline[4096];
-      uint32_t written = sprintf(logline, "%c", byteBuffer[i]);
-      fwrite(logline, written, 1, log);
-
-      i++;
-    }
-  }
-
   fclose(fd);
 
   getchar();
@@ -77,4 +58,23 @@ int main(int argc, char **argv) {
   fflush(stdout);
 }
 
-void PrintToScreen(State state, uint32_t col, uint32_t row, char *Buffer) {}
+void PrintToScreen(State state, FILE *log) {
+
+  uint32_t i = 0;
+  for (uint32_t y = 1; y < state.rowAmount; y++) {
+    for (uint32_t x = 1; x < state.colAmount; x++) {
+      if (state.byteBuffer[i] == '\n') {
+        i++;
+        break;
+      }
+      printf("\033[%d;%df", y, x);
+      fflush(stdout);
+      printf("%c", state.byteBuffer[i]);
+
+      char logline[4096];
+      uint32_t written = sprintf(logline, "%c", state.byteBuffer[i]);
+      fwrite(logline, written, 1, log);
+      i++;
+    }
+  }
+}
