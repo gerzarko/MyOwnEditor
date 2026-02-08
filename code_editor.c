@@ -19,6 +19,7 @@ int main(int argc, char **argv) {
 
   printf("\033[?1049h");
   printf("\033[0;0f");
+  // printf("\033[H");
   fflush(stdout);
 
   uint32_t sizeOfbuffer = windowSize.ws_row * windowSize.ws_col;
@@ -41,26 +42,26 @@ int main(int argc, char **argv) {
   }
 
   uint32_t i = 0;
-  for (uint32_t y = 0; y < windowSize.ws_row; y++) {
-    for (uint32_t x = 0; x < windowSize.ws_col; x++) {
+  for (uint32_t y = 1; y < windowSize.ws_row; y++) {
+    for (uint32_t x = 1; x < windowSize.ws_col; x++) {
       if (byteBuffer[i] == '\n') {
-        y++;
-        x = 0;
         i++;
+        break;
       }
       printf("\033[%d;%df", y, x);
       fflush(stdout);
-      printf("%c", byteBuffer[x + (y * windowSize.ws_col)]);
+      printf("%c", byteBuffer[i]);
 
       char logline[4096];
-      uint32_t written =
-          sprintf(logline, "%d %d \n", windowSize.ws_row, windowSize.ws_col);
+      uint32_t written = sprintf(logline, "%c", byteBuffer[i]);
       fwrite(logline, written, 1, log);
+
+      i++;
     }
   }
 
   fclose(fd);
-  // sleep(5);
+
   getchar();
   printf("\033[?1049l");
   fflush(stdout);
