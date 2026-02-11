@@ -13,10 +13,11 @@ typedef struct State {
   uint32_t bufferSize;
   uint32_t colAmount;
   uint32_t rowAmount;
+  uint32_t pointer;
 
 } State;
 
-void DrawToScreen(State state, FILE *log);
+void DrawToScreen(State *state);
 
 int main(int argc, char **argv) {
 
@@ -43,6 +44,7 @@ int main(int argc, char **argv) {
   state.byteBuffer = malloc(state.bufferSize);
   state.colAmount = windowSize.ws_col;
   state.rowAmount = windowSize.ws_row;
+  state.pointer = 0;
   state.fd = fopen(argv[1], "r");
   FILE *log = fopen(argv[2], "w");
   if (state.fd == NULL) {
@@ -50,19 +52,27 @@ int main(int argc, char **argv) {
   }
 
   int input = 0;
+  int itemsRead = 0;
 
   do {
-    uint32_t itemsRead = fread(state.byteBuffer, 1, state.bufferSize, state.fd);
+    if (itemsRead <= state.pointer) {
+      uint32_t itemsRead =
+          fread(state.byteBuffer, 1, state.bufferSize, state.fd);
+      state.pointer = 0;
+    }
+    char logLine[4096];
+    sprintf(logLine, "el germancito estuvo aqui\n");
+    fwrite(logLine, strlen(logLine), 1, log);
     if (itemsRead == 0) {
-      char logLine[4096];
-      sprintf(logLine, "el germancito estuvo aqui\n");
-      fwrite(logLine, strlen(logLine), 1, log);
-      printf("aca");
+      // char logLine[4096];
+      // sprintf(logLine, "el germancito estuvo aqui\n");
+      // fwrite(logLine, strlen(logLine), 1, log);
+      // printf("aca");
       // state.byteBuffer = state.byteBuffer + 200;
     }
-    DrawToScreen(state, log);
+    DrawToScreen(&state);
     input = getchar();
-    char logLine[4096];
+    // char logLine[4096];
     sprintf(logLine, "%d\n", input);
     fwrite(logLine, strlen(logLine), 1, log);
   } while (input != 133);
@@ -70,24 +80,27 @@ int main(int argc, char **argv) {
   // fd es el puntero al inicio del archivo, bytebuffer es la canatidad de
   // bytes que vamos leyendo de ese archivo
   fclose(state.fd);
+  fclose(log);
 
   printf("\033[?1049l");
   fflush(stdout);
 }
 
-void DrawToScreen(State state, FILE *log) {
-  uint32_t i = 0;
+void DrawToScreen(State *state) {
 
-  for (uint32_t y = 0; y < state.rowAmount; y++) {
-    for (uint32_t x = 0; x < state.colAmount; x++) {
-      if (state.byteBuffer[i] == '\n') {
-        i++;
+  for (uint32_t y = 0; y < state->rowAmount; y++) {
+    for (uint32_t x = 0; x < state->colAmount; x++) {
+      if (state->bufferSize <= state->pointer) {
+        return;
+      }
+      if (state->byteBuffer[state->pointer] == '\n') {
+        state->pointer++;
         break;
       }
       printf("\033[%d;%df", y + 1, x + 1);
       fflush(stdout);
-      printf("%c", state.byteBuffer[i]);
-      i++;
+      printf("%c", state->byteBuffer[state->pointer]);
+      state->pointer++;
     }
   }
 }
